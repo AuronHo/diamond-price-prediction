@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Predict Diamond Price</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="flex justify-between items-center p-6 bg-gray-900 shadow-md">
+        <div class="text-2xl font-bold text-white">
+            TokoBerlian
+        </div>
+        <div>
+            <a href="/" class="text-gray-300 mx-4 hover:text-white hover:underline">Home</a>
+            <a href="/predict" class="text-gray-300 mx-4 hover:text-white hover:underline">Predict Price</a>
+        </div>
+    </nav>
+
+    <!-- Main Content (Prediction Form) -->
+    <main class="flex-grow flex items-start justify-center gap-12 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8 p-10 bg-gray-900 rounded-2xl shadow-2xl border border-gray-700">
+            <div class="text-center">
+                <h2 class="text-3xl font-extrabold text-white mb-6">Diamond Price Prediction 💎</h2>
+                <p class="text-gray-400">Fill the details below to predict the diamond price</p>
+            </div>
+            {% if error %}
+                <div class="bg-red-500 text-white p-3 rounded mb-4">
+                    {{ error }}
+                </div>
+            {% endif %}
+            
+            <form class="mt-8 space-y-6" method="POST" action="/predict/">
+                {% csrf_token %}
+                <div class="rounded-md shadow-sm space-y-5">
+            
+                    <!-- Carat -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Carat</label>
+                        <input type="number" step="0.01" name="carat"
+                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                            focus:border-white focus:ring-4 focus:ring-white" required>
+                    </div>
+            
+                    <!-- Depth -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Depth</label>
+                        <input type="number" step="0.01" name="depth"
+                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                            focus:border-white focus:ring-4 focus:ring-white" required>
+                    </div>
+
+                    <!-- Table -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Table</label>
+                        <input type="number" step="0.01" name="table"
+                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                            focus:border-white focus:ring-4 focus:ring-white" required>
+                    </div>
+
+                      <!-- X -->
+                      <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">X</label>
+                        <input type="number" step="0.01" name="x"
+                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                            focus:border-white focus:ring-4 focus:ring-white" required>
+                    </div>
+
+                    <!-- Y -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Y</label>
+                        <input type="number" step="0.01" name="y"
+                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                            focus:border-white focus:ring-4 focus:ring-white" required>
+                    </div>
+
+                    <!-- Z -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Z</label>
+                        <input type="number" step="0.01" name="z"
+                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                            focus:border-white focus:ring-4 focus:ring-white" required>
+                    </div>
+            
+                    <!-- Cut Quality -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Cut Quality</label>
+                        <select name="cut_label"
+                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                            focus:border-white focus:ring-4 focus:ring-white" required>
+                            <option value="0">Fair</option>
+                            <option value="1">Good</option>
+                            <option value="2">Very Good</option>
+                            <option value="3">Premium</option>
+                            <option value="4">Ideal</option>
+                        </select>
+                    </div>
+            
+                    <!-- Clarity -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Clarity</label>
+                        <select name="clarity_label"
+                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                            focus:border-white focus:ring-4 focus:ring-white" required>
+                            <option value="0">I1</option>
+                            <option value="1">SI2</option>
+                            <option value="2">SI1</option>
+                            <option value="3">VS2</option>
+                            <option value="4">VS1</option>
+                            <option value="5">VVS2</option>
+                            <option value="6">VVS1</option>
+                            <option value="7">IF</option>
+                        </select>
+                    </div>
+            
+                    <!-- Color -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Color</label>
+                        <select name="color_index"
+                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                            focus:border-white focus:ring-4 focus:ring-white" required>
+                            <option value="0">D</option>
+                            <option value="1">E</option>
+                            <option value="2">F</option>
+                            <option value="3">G</option>
+                            <option value="4">H</option>
+                            <option value="5">I</option>
+                            <option value="6">J</option>
+                        </select>
+                    </div>
+            
+                    <!-- Submit Button -->
+                    <div>
+                        <button type="submit"
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md 
+                            shadow-sm text-sm font-medium bg-gray-200 hover:bg-gray-100 text-black text-lg font-bold 
+                            rounded-full transition duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 
+                            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white">
+                            Predict Price
+                        </button>
+                    </div>
+            
+                </div>
+            </form>            
+            
+        </div>
+        <!-- Prediction Result -->
+        {% if predicted_price is not None %}
+        <div class="p-6 bg-gray-800 rounded-lg shadow-lg text-center">
+            <h2 class="text-2xl font-bold text-white mb-4">Predicted Diamond Price</h2>
+            <p class="text-3xl text-green-400">${{ predicted_price }}</p>
+        </div>
+        {% endif %}
+    </main>
+
+</body>
+</html>
