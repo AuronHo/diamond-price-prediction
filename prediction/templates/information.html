@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <body class="bg-black text-white min-h-screen">
+        <main class="flex flex-col items-center p-6 w-full">
+
+            <!-- Title Section -->
+            <section class="w-full text-center mb-12">
+                <h1 class="text-4xl font-bold text-white">Diamond's Features Guide</h1>
+            </section>
+
+            <!-- GIA Section -->
+            <section class="w-full bg-gray-900 p-12">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-3xl font-bold text-white mb-4">Based on GIA (Gemological Institute of America)</h2>
+                    <p class="text-lg text-gray-300 mb-6">
+                        Recognized as a leading authority in gemology and the certification of diamonds and other gemstones. GIA is best known for developing the 4Cs grading system used to assess the quality of diamonds, which includes Clarity, Cut, Color, and Carat.
+                    </p>
+                    <img src="{% static 'prediction/images/GIA_Logo_Transparent-SVG.svg' %}" alt="GIA Logo" class="w-[200px] mx-auto mt-6">
+                </div>
+            </section>
+
+            <!-- Clarity Section -->
+            <section class="w-full bg-gray-800 py-12">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-2xl font-semibold text-white mb-4">Clarity</h2>
+                    <img src="{% static 'prediction/images/clarity.jpg' %}" alt="Clarity Example" class="w-full h-auto object-cover rounded-lg shadow-lg mb-6">
+                    <img src="{% static 'prediction/images/clarity2.jpg' %}" alt="Clarity Example" class="w-full h-auto object-cover rounded-lg shadow-lg mb-6">
+                    <p class="text-gray-300">
+                        Clarity refers to the absence of inclusions or blemishes in a diamond. A diamond with higher clarity is more valuable.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Cut Section -->
+            <section class="w-full bg-gray-900 py-12">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-2xl font-semibold text-white mb-4">Cut</h2>
+                    <img src="{% static 'prediction/images/cut.jpg' %}" alt="Cut Example" class="w-full h-auto object-contain rounded-lg shadow-lg mb-6">
+                    <p class="text-gray-300">
+                        The cut of a diamond affects how it interacts with light. A well-cut diamond shines more brightly.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Color Section -->
+            <section class="w-full bg-gray-800 py-12">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-2xl font-semibold text-white mb-4">Color</h2>
+                    <input type="range" min="0" max="6" value="0" id="colorRange" class="w-full mb-4 accent-white">
+                    <span id="colorLabel" class="block text-center mb-4 text-lg">D (Colorless)</span>
+                    <div id="colorDisplay" class="w-full h-20 border border-gray-400 rounded mx-auto mb-6" style="background-color: #ffffff;"></div>
+                    <p class="text-gray-300">
+                        Color ranges from D (colorless) to Z (light yellow or brown). The less color, the higher the value.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Diamond Graph (Height and Depth) -->
+            <section class="w-full bg-gray-900 py-12">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-2xl font-semibold text-white mb-4">Diamond Dimensions Visualized (Height and Depth)</h2>
+                    <div id="diamondGraphCurrent" class="flex justify-center items-center h-[300px] bg-gray-700 rounded-lg"></div>
+                </div>
+            </section>
+
+            <!-- Diamond Graph (Top View) -->
+            <section class="w-full bg-gray-800 py-12">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-2xl font-semibold text-white mb-4">Diamond Dimensions Visualized (Top View)</h2>
+                    <div id="diamondGraphTop" class="flex justify-center items-center h-[300px] bg-gray-700 rounded-lg"></div>
+                </div>
+            </section>
+
+            <!-- Button Section -->
+            <section class="w-full text-center py-12">
+                <a href="/predict" class="px-8 py-4 bg-gray-200 hover:bg-gray-100 text-black text-lg font-bold rounded-full transition duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105">
+                    Predict Now
+                </a>
+            </section>
+
+        </main>
+        <script>
+            // Color change logic
+            const colorLabels = ['D (Colorless)', 'E', 'F', 'G', 'H', 'I', 'J (Yellowish)'];
+            const colorShades = ['#ffffff', '#fef8e1', '#fef4c3', '#fdf0a2', '#fbe77d', '#f8db56', '#f5d13f'];
+            const colorRange = document.getElementById('colorRange');
+            const colorLabel = document.getElementById('colorLabel');
+            const colorDisplay = document.getElementById('colorDisplay');
+
+            colorRange.addEventListener('input', (e) => {
+                const idx = e.target.value;
+                colorLabel.innerText = colorLabels[idx];
+                colorDisplay.style.backgroundColor = colorShades[idx];
+            });
+
+            // Graph Data for Diamond Representation (Height and Depth)
+            const svgWidth = 600;
+            const svgHeight = 300;
+
+            // Current Model Graph (Height - Z)
+            const svgCurrent = d3.select("#diamondGraphCurrent")
+                .append("svg")
+                .attr("width", svgWidth)
+                .attr("height", svgHeight);
+
+            // Define points for the diamond (Height and Depth)
+            const pointsCurrent = [
+                { x: 300, y: 100 },   // Top center (table)
+                { x: 250, y: 140 },   // Top left edge
+                { x: 200, y: 180 },   // Middle left
+                { x: 300, y: 300 },   // Bottom (culet)
+                { x: 400, y: 180 },   // Middle right
+                { x: 350, y: 140 },   // Top right edge
+                { x: 270, y: 180 },   // Internal facet left
+                { x: 330, y: 180 },   // Internal facet right
+                { x: 300, y: 300 },   // Internal base
+                { x: 250, y: 140 },   // Left table edge (point 1)
+                { x: 350, y: 140 }    // Right table edge (point 5)
+            ];
+
+            const facetsCurrent = [
+                [0, 1, 6],
+                [0, 6, 8],
+                [0, 8, 7],
+                [0, 7, 5],
+                [1, 2, 6],
+                [2, 3, 8],  // split from [2, 3, 8, 6]
+                [2, 8, 6],
+                [3, 4, 8],  // split from [3, 4, 8, 7]
+                [4, 8, 7],
+                [4, 5, 7],
+            ];
+
+            // Draw facets for Current Model (Height and Depth)
+            svgCurrent.selectAll("polygon")
+                .data(facetsCurrent)
+                .enter()
+                .append("polygon")
+                .attr("points", d => d.map(i => `${pointsCurrent[i].x},${pointsCurrent[i].y}`).join(" "))
+                .attr("fill", "#A8F1FF")
+                .attr("stroke", "#183B4E")
+                .attr("stroke-width", 2)
+                .attr("opacity", 1);
+
+            // Add shimmer pulse
+            svgCurrent.append("circle")
+                .attr("cx", 300)
+                .attr("cy", 100)
+                .attr("r", 6)
+                .attr("fill", "white")
+                .attr("opacity", 0.8)
+                .transition()
+                .duration(1500)
+                .ease(d3.easeSinInOut)
+                .attr("r", 12)
+                .attr("opacity", 0)
+                .on("end", function repeat() {
+                    d3.select(this)
+                        .attr("r", 6)
+                        .attr("opacity", 0.8)
+                        .transition()
+                        .duration(1500)
+                        .ease(d3.easeSinInOut)
+                        .attr("r", 12)
+                        .attr("opacity", 0)
+                        .on("end", repeat);
+                });
+
+            // Add axis arrows and labels (Current Model)
+            svgCurrent.append("line")
+                .attr("x1", 300)
+                .attr("y1", 50)
+                .attr("x2", 300)
+                .attr("y2", 280)
+                .attr("stroke", "white")
+                .attr("stroke-width", 3)
+                .attr("marker-end", "url(#arrow)");
+
+            svgCurrent.append("text")
+                .attr("x", 310)
+                .attr("y", 60)
+                .attr("fill", "white")
+                .style("font-size", "14px")
+                .style("font-weight", "bold")
+                .text("Z ( Height )");
+
+            //Table 
+            svgCurrent.append("text")
+                .attr("x", 310)
+                .attr("y", 100)
+                .attr("fill", "white")
+                .style("font-size", "14px")
+                .style("font-weight", "bold")
+                .text("Table")
+
+            // Depth Label: From the girdle to culet (along the Y-axis)
+            svgCurrent.append("line")
+                .attr("x1", 300)
+                .attr("y1", 100)
+                .attr("x2", 300)
+                .attr("y2", 300)
+                .attr("stroke", "white")
+                .attr("stroke-width", 3)
+                .attr("marker-end", "url(#arrow)")
+
+            svgCurrent.append("line")
+                .attr("x1", 200)  // start x
+                .attr("y1", 180)  // fixed y
+                .attr("x2", 400)  // end x
+                .attr("y2", 180)  // same y
+                .attr("stroke-width", 3)
+                .attr("stroke", "white")
+                .attr("marker-end", "url(#arrow)");
+
+            svgCurrent.append("text")
+                .attr("x", 310)
+                .attr("y", 200)
+                .attr("fill", "white")
+                .style("font-size", "14px")
+                .style("font-weight", "bold")
+                .text("Depth")
+
+            // Top View Graph (Circle with X and Y Axes)
+            const svgWidthTop = 600;
+            const svgHeightTop = 300;
+
+            const svgTop = d3.select("#diamondGraphTop")
+                .append("svg")
+                .attr("width", svgWidthTop)
+                .attr("height", svgHeightTop);
+
+            // Draw the circle representing the top view of the diamond
+            svgTop.append("circle")
+                .attr("cx", 300)
+                .attr("cy", 150)
+                .attr("r", 100)  // Radius of the circle
+                .attr("fill", "#A8F1FF")
+                .attr("stroke", "#183B4E")
+                .attr("stroke-width", 2);
+
+            // Draw the horizontal X-axis line (centered)
+            svgTop.append("line")
+                .attr("x1", 200)
+                .attr("y1", 150)
+                .attr("x2", 400)
+                .attr("y2", 150)
+                .attr("stroke", "#183B4E")
+                .attr("stroke-width", 2);
+
+            // Draw the vertical Y-axis line (centered)
+            svgTop.append("line")
+                .attr("x1", 300)
+                .attr("y1", 50)
+                .attr("x2", 300)
+                .attr("y2", 250)
+                .attr("stroke", "#183B4E")
+                .attr("stroke-width", 2);
+
+            // Label X-axis
+            svgTop.append("text")
+                .attr("x", 405)
+                .attr("y", 155)
+                .attr("fill", "white")
+                .style("font-size", "14px")
+                .style("font-weight", "bold")
+                .text("X ( Length )");
+
+            // Label Y-axis
+            svgTop.append("text")
+                .attr("x", 300)
+                .attr("y", 45)
+                .attr("fill", "white")
+                .style("font-size", "14px")
+                .style("font-weight", "bold")
+                .text("Y ( Width )");
+        </script>
+    </body>
+{% endblock %}

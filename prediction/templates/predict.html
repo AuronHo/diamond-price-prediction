@@ -1,159 +1,178 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Predict Diamond Price</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-black min-h-screen flex flex-col">
+{% extends 'base.html' %}
 
-    <!-- Navbar -->
-    <nav class="flex justify-between items-center p-6 bg-gray-900 shadow-md">
-        <div class="text-2xl font-bold text-white">
-            TokoBerlian
-        </div>
-        <div>
-            <a href="/" class="text-gray-300 mx-4 hover:text-white hover:underline">Home</a>
-            <a href="/predict" class="text-gray-300 mx-4 hover:text-white hover:underline">Predict Price</a>
-        </div>
-    </nav>
+{% load humanize %}
 
-    <!-- Main Content (Prediction Form) -->
-    <main class="flex-grow flex items-start justify-center gap-12 py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md w-full space-y-8 p-10 bg-gray-900 rounded-2xl shadow-2xl border border-gray-700">
-            <div class="text-center">
-                <h2 class="text-3xl font-extrabold text-white mb-6">Diamond Price Prediction 💎</h2>
-                <p class="text-gray-400">Fill the details below to predict the diamond price</p>
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <body class="bg-black min-h-screen flex flex-col">
+        <!-- Main Content (Prediction Form) -->
+        <main class="flex-grow flex items-start justify-center gap-12 py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-md w-full space-y-8 p-10 bg-gray-900 rounded-2xl shadow-2xl border border-gray-700">
+                <div class="text-center">
+                    <h2 class="text-3xl font-extrabold text-white mb-6">Diamond Price Prediction 💎</h2>
+                    <p class="text-gray-400">Fill the details below to predict the diamond price</p>
+                    <a href="/information" class="text-white mx-4 hover:underline">Please see the guide to each input here</a>
+                </div>
+                {% if error %}
+                    <div class="bg-red-500 text-white p-3 rounded mb-4">
+                        {{ error }}
+                    </div>
+                {% endif %}
+                
+                <form class="mt-8 space-y-6" method="POST" action="/predict/">
+                    {% csrf_token %}
+                    <div class="rounded-md shadow-sm space-y-5">
+                
+                        <!-- Carat -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Carat</label>
+                            <input type="number" step="0.01" name="carat"
+                                class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                                focus:border-white focus:ring-4 focus:ring-white" required>
+                        </div>
+                
+                        <!-- Depth -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Depth</label>
+                            <input type="number" step="0.01" name="depth"
+                                class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                                focus:border-white focus:ring-4 focus:ring-white" required>
+                        </div>
+
+                        <!-- Table -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Table</label>
+                            <input type="number" step="0.01" name="table"
+                                class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                                focus:border-white focus:ring-4 focus:ring-white" required>
+                        </div>
+
+                        <!-- X -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">X ( Length )</label>
+                            <input type="number" step="0.01" name="x"
+                                class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                                focus:border-white focus:ring-4 focus:ring-white" required>
+                        </div>
+
+                        <!-- Y -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Y ( Width )</label>
+                            <input type="number" step="0.01" name="y"
+                                class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                                focus:border-white focus:ring-4 focus:ring-white" required>
+                        </div>
+
+                        <!-- Z -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Z ( Height )</label>
+                            <input type="number" step="0.01" name="z"
+                                class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                                focus:border-white focus:ring-4 focus:ring-white" required>
+                        </div>
+                
+                        <!-- Cut Quality -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Cut Quality</label>
+                            <select name="cut_label"
+                                class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                                focus:border-white focus:ring-4 focus:ring-white" required>
+                                <option value="0" data-label="Fair">Fair</option>
+                                <option value="1" data-label="Good">Good</option>
+                                <option value="2" data-label="Very Good">Very Good</option>
+                                <option value="3" data-label="Premium">Premium</option>
+                                <option value="4" data-label="Ideal">Ideal</option>
+                            </select>
+                            <input type="hidden" name="cut" id="cut_name">
+                        </div>
+                
+                        <!-- Clarity -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Clarity</label>
+                            <select name="clarity_label"
+                                class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                                focus:border-white focus:ring-4 focus:ring-white" required>
+                                <option value="0" data-label="I1 (Inclusions Included)">I1 (Inclusions Included)</option>
+                                <option value="1" data-label="SI2 (Slightly Included)">SI2 (Slightly Included)</option>
+                                <option value="2" data-label="SI1">SI1</option>
+                                <option value="3" data-label="VS2 (Very Slightly Included)">VS2 (Very Slightly Included)</option>
+                                <option value="4" data-label="VS1">VS1</option>
+                                <option value="5" data-label="VVS2 (Very, Very Slightly Included)">VVS2 (Very, Very Slightly Included)</option>
+                                <option value="6" data-label="VVS1">VVS1</option>
+                                <option value="7" data-label="IF (Internally Flawless)">IF (Internally Flawless)</option>
+                            </select>
+                            <input type="hidden" name="clarity" id="clarity_name">
+                        </div>
+                
+                        <!-- Color -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Color</label>
+                            <select name="color_index"
+                                class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
+                                focus:border-white focus:ring-4 focus:ring-white" required>
+                                <option value="0" data-label="D (Clear)">D (Clear)</option>
+                                <option value="1" data-label="E">E</option>
+                                <option value="2" data-label="F">F</option>
+                                <option value="3" data-label="G">G</option>
+                                <option value="4" data-label="H">H</option>
+                                <option value="5" data-label="I">I</option>
+                                <option value="6" data-label="J (Yellowish)">J (Yellowish)</option>
+                            </select>
+                            <input type="hidden" name="color" id="color_name">
+                        </div>
+                
+                        <!-- Submit Button -->
+                        <div>
+                            <button type="submit"
+                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md 
+                                shadow-sm text-sm font-medium bg-gray-200 hover:bg-gray-100 text-black text-lg font-bold 
+                                rounded-full transition duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 
+                                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white">
+                                Predict Price
+                            </button>
+                        </div>
+                
+                    </div>
+                </form>            
+                
             </div>
-            {% if error %}
-                <div class="bg-red-500 text-white p-3 rounded mb-4">
-                    {{ error }}
-                </div>
+            <!-- Prediction Result -->
+            {% if predicted_price is not None %}
+            <div class="p-6 bg-gray-800 rounded-2xl shadow-xl text-center space-y-4">
+            <h2 class="text-2xl font-bold text-white">Predicted Diamond Price</h2>
+
+            <div class="bg-gray-700 p-4 rounded-lg">
+                <p class="text-sm text-gray-300 uppercase tracking-wide">Estimated Price (USD)</p>
+                <p class="text-3xl font-semibold text-green-400 mt-1">${{ predicted_price|floatformat:2|intcomma }}</p>
+            </div>
+
+            <div class="bg-gray-700 p-4 rounded-lg">
+                <p class="text-sm text-gray-300 uppercase tracking-wide">Price in Indonesian Rupiah (IDR)</p>
+                <p class="text-2xl font-medium text-blue-400 mt-1">{{ predicted_price_idr }}</p>
+            </div>
+
+            <div class="pt-4 text-white text-base italic hover:underline">
+            <a href="/product">Looking for a diamond with similar value? We’ve got one just for you.</a>
+            </div>
             {% endif %}
-            
-            <form class="mt-8 space-y-6" method="POST" action="/predict/">
-                {% csrf_token %}
-                <div class="rounded-md shadow-sm space-y-5">
-            
-                    <!-- Carat -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Carat</label>
-                        <input type="number" step="0.01" name="carat"
-                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
-                            focus:border-white focus:ring-4 focus:ring-white" required>
-                    </div>
-            
-                    <!-- Depth -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Depth</label>
-                        <input type="number" step="0.01" name="depth"
-                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
-                            focus:border-white focus:ring-4 focus:ring-white" required>
-                    </div>
+        </main>
 
-                    <!-- Table -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Table</label>
-                        <input type="number" step="0.01" name="table"
-                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
-                            focus:border-white focus:ring-4 focus:ring-white" required>
-                    </div>
+    </body>
 
-                      <!-- X -->
-                      <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">X</label>
-                        <input type="number" step="0.01" name="x"
-                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
-                            focus:border-white focus:ring-4 focus:ring-white" required>
-                    </div>
+    <script>
+        function updateLabel(selectElem, hiddenInputId) {
+            const label = selectElem.options[selectElem.selectedIndex].dataset.label;
+            document.getElementById(hiddenInputId).value = label;
+        }
 
-                    <!-- Y -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Y</label>
-                        <input type="number" step="0.01" name="y"
-                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
-                            focus:border-white focus:ring-4 focus:ring-white" required>
-                    </div>
-
-                    <!-- Z -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Z</label>
-                        <input type="number" step="0.01" name="z"
-                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
-                            focus:border-white focus:ring-4 focus:ring-white" required>
-                    </div>
-            
-                    <!-- Cut Quality -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Cut Quality</label>
-                        <select name="cut_label"
-                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
-                            focus:border-white focus:ring-4 focus:ring-white" required>
-                            <option value="0">Fair</option>
-                            <option value="1">Good</option>
-                            <option value="2">Very Good</option>
-                            <option value="3">Premium</option>
-                            <option value="4">Ideal</option>
-                        </select>
-                    </div>
-            
-                    <!-- Clarity -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Clarity</label>
-                        <select name="clarity_label"
-                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
-                            focus:border-white focus:ring-4 focus:ring-white" required>
-                            <option value="0">I1</option>
-                            <option value="1">SI2</option>
-                            <option value="2">SI1</option>
-                            <option value="3">VS2</option>
-                            <option value="4">VS1</option>
-                            <option value="5">VVS2</option>
-                            <option value="6">VVS1</option>
-                            <option value="7">IF</option>
-                        </select>
-                    </div>
-            
-                    <!-- Color -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Color</label>
-                        <select name="color_index"
-                            class="w-full p-3 rounded-md bg-gray-800 text-white border-2 border-gray-600 
-                            focus:border-white focus:ring-4 focus:ring-white" required>
-                            <option value="0">D</option>
-                            <option value="1">E</option>
-                            <option value="2">F</option>
-                            <option value="3">G</option>
-                            <option value="4">H</option>
-                            <option value="5">I</option>
-                            <option value="6">J</option>
-                        </select>
-                    </div>
-            
-                    <!-- Submit Button -->
-                    <div>
-                        <button type="submit"
-                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md 
-                            shadow-sm text-sm font-medium bg-gray-200 hover:bg-gray-100 text-black text-lg font-bold 
-                            rounded-full transition duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 
-                            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white">
-                            Predict Price
-                        </button>
-                    </div>
-            
-                </div>
-            </form>            
-            
-        </div>
-        <!-- Prediction Result -->
-        {% if predicted_price is not None %}
-        <div class="p-6 bg-gray-800 rounded-lg shadow-lg text-center">
-            <h2 class="text-2xl font-bold text-white mb-4">Predicted Diamond Price</h2>
-            <p class="text-3xl text-green-400">${{ predicted_price }}</p>
-        </div>
-        {% endif %}
-    </main>
-
-</body>
-</html>
+        // Initialize hidden inputs on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            updateLabel(document.querySelector('select[name="cut_label"]'), 'cut_name');
+            updateLabel(document.querySelector('select[name="clarity_label"]'), 'clarity_name');
+            updateLabel(document.querySelector('select[name="color_index"]'), 'color_name');
+        });
+    </script>
+{% endblock %}

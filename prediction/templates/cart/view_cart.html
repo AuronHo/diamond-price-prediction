@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% load static %}
+
+{% block title %}Our Diamond Collection{% endblock %}
+
+{% block content %}
+
+<div class="bg-black min-h-screen py-10 px-6 text-white">
+    <h1 class="text-3xl font-bold text-center mb-8">Your Shopping Cart</h1>
+
+    {% if cart_items %}
+        <div class="space-y-6 max-w-4xl mx-auto">
+            {% for item in cart_items %}
+                <div class="flex items-center bg-gray-900 rounded-xl shadow-lg p-4">
+                    <img src="{{ item.diamond.image.url }}" alt="{{ item.diamond.name }}"
+                         class="w-24 h-24 object-cover rounded-lg mr-6">
+                    <div class="flex-1">
+                        <h2 class="text-xl font-semibold">{{ item.diamond.name }}</h2>
+                        <p class="text-gray-400">Carat: {{ item.diamond.carat }} | {{ item.diamond.cut }}, {{ item.diamond.color }}</p>
+                        <p class="text-gray-400">Clarity: {{ item.diamond.clarity }}</p>
+                        <p class="text-gray-400">Quantity: {{ item.quantity }}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-lg font-bold">Rp{{ item.diamond.price_idr|intcomma }}</p>
+                        <form method="post" action="{% url 'remove_from_cart' item.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="text-red-400 hover:text-red-200 mt-2 text-sm underline">
+                                Remove
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-10 max-w-4xl mx-auto text-right items-center flex justify-center">
+            <h2 class="text-2xl font-bold">Total: Rp{{ total_price|intcomma }}</h2>
+        </div>
+        <div class="mt-5 tems-center flex justify-center">
+            <a href="{% url 'checkout' %}">
+                <div class="checkout-container">
+                    <div class="checkout-left">
+                    <div class="checkout-card">
+                        <div class="card-line"></div>
+                        <div class="buttons"></div>
+                    </div>
+                    <div class="checkout-post">
+                        <div class="post-line"></div>
+                        <div class="screen">
+                        <div class="dollar">Rp</div>
+                        </div>
+                        <div class="numbers"></div>
+                        <div class="numbers-line2"></div>
+                    </div>
+                    </div>
+                    <div class="checkout-right">
+                    <div class="new">Checkout</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% else %}
+        <p class="text-center text-gray-400">Your cart is empty.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

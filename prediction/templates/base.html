@@ -1,0 +1,79 @@
+{% load humanize %}
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Diamond Prediction Website</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="{% static 'css/diamond_card.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login_form.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/prediction_history.css' %}">
+    <link rel="stylesheet" href="{% static 'css/checkout_button.css' %}">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- D3.js Library -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="flex justify-between items-center p-6 bg-gray-900 shadow-md no-print">
+        <div class="text-2xl font-bold text-white">
+            TokoBerlian
+        </div>
+        <div>
+            <a href="/" class="text-gray-300 mx-4 hover:text-white hover:underline">Home</a>
+            <a href="/predict" class="text-gray-300 mx-4 hover:text-white hover:underline">Predict Price</a>
+            <a href="/information" class="text-gray-300 mx-4 hover:text-white hover:underline">Read Me</a>
+            <a href="/product" class="text-gray-300 mx-4 hover:text-white hover:underline">Our Diamonds</a>
+        {% if request.user.is_authenticated %}
+            {% if request.user.is_superuser %}
+                <a href="{% url 'dashboard' %}" class="text-gray-300 mx-4 hover:text-white hover:underline">Dashboard</a>
+            {% else %}
+                <a href="{% url 'view_cart' %}" class="text-gray-300 mx-4 hover:text-white hover:underline">Cart</a>
+            {% endif %}
+            <a href="{% url 'logout' %}" class="text-gray-300 mx-4 hover:text-white hover:underline">Logout</a>
+
+            <!-- 👋 Greeting -->
+            <span class="text-gray-300 mx-4 hover:text-white">
+                Hi! {{ request.user.first_name|default:request.user.username }}
+            </span>
+        {% else %}
+            <a href="/login" 
+            class="ml-4 inline-flex items-center gap-1 px-5 py-1 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold shadow-lg hover:from-purple-600 hover:to-indigo-700 transition duration-300">
+                
+                <!-- User Icon -->
+                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4h-4Z" clip-rule="evenodd"/>
+                </svg>
+
+                <!-- Button Text -->
+                Login
+            </a>
+        {% endif %}
+    </nav>
+
+    <!-- Dynamic content block -->
+    <div>
+        {% block content %}
+        {% endblock %}
+    </div>
+
+      <!-- Footer -->
+    <footer class="bg-gray-900 py-8 text-center text-gray-500 text-sm no-print">
+        <p>&copy; {{ year }} DiamondAI. All rights reserved.</p>
+        <div class="mt-2">
+            <a href="/" class="hover:text-white px-2">Home</a> |
+            <a href="/predict" class="hover:text-white px-2">Predict</a> |
+            <a href="/cart" class="hover:text-white px-2">Cart</a>
+        </div>
+    </footer>
+</body>
+</html>

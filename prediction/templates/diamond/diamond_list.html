@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Diamond List{% endblock %}
+
+{% block content %}
+<div class="prediction-history-page">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Manage Diamonds</h2>
+        <a href="{% url 'diamond_create' %}" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white">+ Add Diamond</a>
+    </div>
+    <div class="overflow-x-auto bg-gray-900 p-6 rounded-xl shadow-md">
+        <button onclick="window.print()" class="print-btn no-print">🖨️ Print to PDF</button>
+        <div class="print-container">
+            <table class="table-container">
+                <thead class="text-xs uppercase bg-gray-700 text-gray-300">
+                    <tr>
+                        <th class="py-3 px-4">Name</th>
+                        <th class="py-3 px-4">Carat</th>
+                        <th class="py-3 px-4">Cut</th>
+                        <th class="py-3 px-4">Color</th>
+                        <th class="py-3 px-4">Clarity</th>
+                        <th class="py-3 px-4">Price (IDR)</th>
+                        <th class="py-3 px-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for diamond in page_obj %}
+                    <tr class="border-b border-gray-700 hover:bg-gray-700">
+                        <td class="py-3 px-4">{{ diamond.name }}</td>
+                        <td class="py-3 px-4">{{ diamond.carat }}</td>
+                        <td class="py-3 px-4">{{ diamond.cut }}</td>
+                        <td class="py-3 px-4">{{ diamond.color }}</td>
+                        <td class="py-3 px-4">{{ diamond.clarity }}</td>
+                        <td class="py-3 px-4">Rp{{ diamond.price_idr|intcomma }}</td>
+                        <td class="py-3 px-4 space-x-2">
+                            <a href="{% url 'diamond_update' diamond.id %}" class="text-blue-400 hover:underline">Edit</a>
+                            <a href="{% url 'diamond_delete' diamond.id %}" class="text-red-400 hover:underline">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination no-print">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="page-link">← Prev</a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <span class="current-page">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="page-link">Next →</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

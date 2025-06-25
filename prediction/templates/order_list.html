@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Order List{% endblock %}
+
+{% block content %}
+<div class="prediction-history-page">
+    <h2 class="text-2xl font-bold text-white mb-6">Orders</h2>
+
+    {% if page_obj %}
+    <div class="overflow-x-auto bg-gray-900 p-6 rounded-xl shadow-md">
+        <button onclick="window.print()" class="print-btn no-print">🖨️ Print to PDF</button>
+        <div class="print-container">
+            <table class="table-container">
+                <thead class="text-xs uppercase bg-gray-700 text-gray-300">
+                    <tr>
+                        <th class="py-2 px-4 border-b text-left">Order ID</th>
+                        <th class="py-2 px-4 border-b text-left">Diamond</th>
+                        <th class="py-2 px-4 border-b text-left">Quantity</th>
+                        <th class="py-2 px-4 border-b text-left">Total Price (IDR)</th>
+                        <th class="py-2 px-4 border-b text-left">Ordered at</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in page_obj %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-2 px-4 border-b">{{ order.id }}</td>
+                        <td class="py-2 px-4 border-b">{{ order.full_name }}</td>
+                        <td class="py-2 px-4 border-b">{{ order.address }}</td>
+                        <td class="py-2 px-4 border-b">Rp{{ order.total_price|floatformat:0|intcomma }}</td>
+                        <td class="py-2 px-4 border-b">{{ order.created_at|date:"Y-m-d H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="pagination no-print">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="page-link">← Prev</a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <span class="current-page">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="page-link">Next →</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+        <p>You have no orders yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

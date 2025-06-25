@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% load static %}
+
+{% block title %}Our Diamond Collection{% endblock %}
+
+{% block content %}
+    <!-- Product Card -->
+    <div class="bg-black min-h-screen py-10 px-6">
+        <h1 class="text-3xl font-bold text-white text-center mb-8">Our Diamond Collection</h1>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {% for diamond in page_obj %}
+        <div class="card">
+            <div class="card__shine"></div>
+            <div class="card__glow"></div>
+            <div class="card__content">
+                <div class="card__badge">NEW</div>
+                <div class="card__image" style="--bg-url: url('{{ diamond.image.url }}');"></div>
+                
+                <div class="card__text">
+                    <p class="card__title">{{ diamond.name }}</p>
+                    <p class="card__description">
+                        Carat: {{ diamond.carat }} | {{ diamond.cut }}, {{ diamond.color }}
+                    </p>
+                    <p class="card__description">
+                        Clarity: {{ diamond.clarity }}
+                    </p>
+                    <p class="card__description">
+                        Depth: {{ diamond.depth }} | Table: {{ diamond.table }}
+                    </p>
+                    <p class="card__description">
+                        Dimensions: {{ diamond.x }}mm × {{ diamond.y }}mm × {{ diamond.z }}mm
+                    </p>
+                </div>
+
+                <div class="card__footer">
+                    <div class="card__price">Rp{{ diamond.price_idr|intcomma }}</div>
+                    <form method="post" action="{% url 'add_to_cart' diamond.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="card__button" title="Add to Cart">
+                            <svg height="16" width="16" viewBox="0 0 24 24">
+                                <path stroke-width="2" stroke="currentColor" d="M4 12H20M12 4V20" fill="currentColor"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="pagination no-print">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="page-link">← Prev</a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <span class="current-page">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="page-link">Next →</a>
+            {% endif %}
+        </div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Prediction History{% endblock %}
+
+{% block content %}
+<div class="prediction-history-page">
+    <h1 class="text-2xl font-bold text-white mb-6">📊 Diamond Price Prediction History</h1>
+
+    <div class="overflow-x-auto bg-gray-900 p-6 rounded-xl shadow-md">
+        <button onclick="window.print()" class="print-btn no-print">🖨️ Print to PDF</button>
+        <div class="print-container">
+            <table class="table-container">
+                <thead class="text-xs uppercase bg-gray-700 text-gray-300">
+                    <tr>
+                        <th class="py-3 px-6">Date</th>
+                        <th class="py-3 px-6">Carat</th>
+                        <th class="py-3 px-6">Cut</th>
+                        <th class="py-3 px-6">Color</th>
+                        <th class="py-3 px-6">Clarity</th>
+                        <th class="py-3 px-6">Depth</th>
+                        <th class="py-3 px-6">Table</th>
+                        <th class="py-3 px-6">X</th>
+                        <th class="py-3 px-6">Y</th>
+                        <th class="py-3 px-6">Z</th>
+                        <th class="py-3 px-6">Price (USD)</th>
+                        <th class="py-3 px-6">Price (IDR)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in page_obj %}
+                    <tr class="bg-gray-800 border-b border-gray-700 hover:bg-gray-700">
+                        <td class="py-3 px-6">{{ p.created_at|date:"Y-m-d H:i" }}</td>
+                        <td class="py-3 px-6">{{ p.carat }}</td>
+                        <td class="py-3 px-6">{{ p.cut }}</td>
+                        <td class="py-3 px-6">{{ p.color }}</td>
+                        <td class="py-3 px-6">{{ p.clarity }}</td>
+                        <td class="py-3 px-6">{{ p.depth }}</td>
+                        <td class="py-3 px-6">{{ p.table }}</td>
+                        <td class="py-3 px-6">{{ p.x }}</td>
+                        <td class="py-3 px-6">{{ p.y }}</td>
+                        <td class="py-3 px-6">{{ p.z }}</td>
+                        <td class="py-3 px-6 text-green-400">${{ p.predicted_price_usd|floatformat:2|intcomma }}</td>
+                        <td class="py-3 px-6 text-blue-400">{{ p.predicted_price_idr|intcomma }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="12" class="text-center py-6 text-gray-500">No prediction data found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="pagination no-print">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="page-link">← Prev</a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <span class="current-page">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="page-link">Next →</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

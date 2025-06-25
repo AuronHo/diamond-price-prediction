@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-black min-h-screen text-white py-10 px-6">
+    <h1 class="text-3xl font-bold mb-6 text-center">Checkout</h1>
+
+    <form method="post" class="max-w-xl mx-auto bg-gray-900 p-6 rounded-xl">
+        {% csrf_token %}
+        <label class="block mb-2">Full Name</label>
+        <input type="text" name="name" required class="w-full p-2 rounded bg-gray-800 text-white mb-4">
+
+        <label class="block mb-2">Address</label>
+        <textarea name="address" required class="w-full p-2 rounded bg-gray-800 text-white mb-4"></textarea>
+
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded">
+            Place Order
+        </button>
+    </form>
+</div>
+{% endblock %}
